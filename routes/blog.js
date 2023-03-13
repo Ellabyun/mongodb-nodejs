@@ -66,4 +66,26 @@ router.get('/posts/:id', async function(req, res){
 
   res.render('post-detail', {post:post});
 })
+
+router.get('/edit/:id', async function(req, res){
+  const editId = req.params.id
+  const post = await db
+  .getDb()
+  .collection('posts')
+  .findOne({_id: new ObjectId(editId)});
+  if(!post){
+    return res.status(404).render('404');
+  }
+  res.render('update-post', {post:post});
+})
+
+router.post('/update/:id', async function(req, res){
+  const postId = req.params.id;
+  const updatedPost = await db
+    .getDb()
+    .collection('posts')
+    .updateOne({_id: new ObjectId(postId)}, {$set:{title: req.body.title, summary: req.body.summary, body: req.body.content}})
+  
+    res.redirect('/posts')
+})
 module.exports = router;
