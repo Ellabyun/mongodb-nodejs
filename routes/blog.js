@@ -99,8 +99,9 @@ router.post('/posts/:id/edit', async function(req, res){
 })
 
 router.post('/posts/:id/delete', async function(req, res){
-  const postId = new Object(req.params.id);
-  const result = await db.getDb().collection('posts').deleteOne({_id: postId})
+  const postId = new ObjectId(req.params.id);
+  const result = await db.getDb().collection('posts').deleteOne({_id: postId});
+  console.log(result);
   res.redirect('/posts');
 })
 module.exports = router;
