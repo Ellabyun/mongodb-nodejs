@@ -67,25 +67,40 @@ router.get('/posts/:id', async function(req, res){
   res.render('post-detail', {post:post});
 })
 
-router.get('/edit/:id', async function(req, res){
+router.get('/posts/:id/edit', async function(req, res){
   const editId = req.params.id
   const post = await db
   .getDb()
   .collection('posts')
-  .findOne({_id: new ObjectId(editId)});
+  .findOne({_id: new ObjectId(editId)}, {title:1, summary:1, body:1});
   if(!post){
     return res.status(404).render('404');
   }
   res.render('update-post', {post:post});
 })
 
-router.post('/update/:id', async function(req, res){
-  const postId = req.params.id;
-  const updatedPost = await db
+router.post('/posts/:id/edit', async function(req, res){
+  const postId = new ObjectId(req.params.id);
+  const result = await db
     .getDb()
     .collection('posts')
-    .updateOne({_id: new ObjectId(postId)}, {$set:{title: req.body.title, summary: req.body.summary, body: req.body.content}})
-  
-    res.redirect('/posts')
+    .updateOne(
+      {_id: postId}, 
+      {
+        $set: {
+          title: req.body.title, 
+          summary: req.body.summary, 
+          body: req.body.content,
+          // date: new Date()
+        }
+      }
+      );
+    res.redirect('/posts');
+})
+
+router.post('/posts/:id/delete', async function(req, res){
+  const postId = new Object(req.params.id);
+  const result = await db.getDb().collection('posts').deleteOne({_id: postId})
+  res.redirect('/posts');
 })
 module.exports = router;
